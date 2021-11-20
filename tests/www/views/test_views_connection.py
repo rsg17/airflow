@@ -180,3 +180,19 @@ def test_duplicate_connection_error(admin_client):
     assert resp.status_code == 200
     response = {conn[0] for conn in session.query(Connection.conn_id).all()}
     assert expected_result == response
+
+
+def test_connection_muldelete(admin_client):
+    conn1 = Connection(
+        conn_id='gcp_connection',
+        conn_type='Google Cloud',
+        description='Google Cloud Connection',
+    )
+    conn2 = Connection(
+        conn_id='aws_connection',
+        conn_type='AWS',
+        description='AWS Connection',
+    )
+    data = {"action": "muldelete", "rowid": [conn1.conn_id, conn2.conn_id]}
+    resp = admin_client.post('/connection/action_post', data=data, follow_redirects=True)
+    assert resp.status_code == 200
